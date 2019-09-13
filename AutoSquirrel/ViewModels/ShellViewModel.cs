@@ -38,7 +38,8 @@
 
             var last = this.UserPreference.LastOpenedProject.LastOrDefault();
 
-            if (!string.IsNullOrEmpty(last) && File.Exists(last)) {
+            if (!string.IsNullOrEmpty(last) && File.Exists(last))
+            {
                 OpenProject(last);
             }
         }
@@ -125,7 +126,8 @@
             get
             {
                 var fp = "New Project" + "*";
-                if (!string.IsNullOrWhiteSpace(this.FilePath)) {
+                if (!string.IsNullOrWhiteSpace(this.FilePath))
+                {
                     fp = Path.GetFileNameWithoutExtension(this.FilePath);
                 }
 
@@ -138,10 +140,12 @@
         /// </summary>
         public void AbortPackageCreation()
         {
-            if (this.ActiveBackgroungWorker != null) {
+            if (this.ActiveBackgroungWorker != null)
+            {
                 this.ActiveBackgroungWorker.CancelAsync();
 
-                if (this.exeProcess != null) {
+                if (this.exeProcess != null)
+                {
                     this.exeProcess.Kill();
                 }
             }
@@ -156,11 +160,13 @@
         {
             MessageBoxResult rslt = MessageBox.Show("Save current project ?", "New Project", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
-            if (rslt == MessageBoxResult.Cancel) {
+            if (rslt == MessageBoxResult.Cancel)
+            {
                 return;
             }
 
-            if (rslt == MessageBoxResult.Yes) {
+            if (rslt == MessageBoxResult.Yes)
+            {
                 Save();
             }
 
@@ -172,7 +178,8 @@
         /// </summary>
         public void OpenProject()
         {
-            try {
+            try
+            {
                 var ofd = new System.Windows.Forms.OpenFileDialog
                 {
                     AddExtension = true,
@@ -181,20 +188,24 @@
                 };
 
                 var iniDir = PathFolderHelper.GetMyDirectory(MyDirectory.Project);
-                if (!string.IsNullOrWhiteSpace(iniDir)) {
+                if (!string.IsNullOrWhiteSpace(iniDir))
+                {
                     ofd.InitialDirectory = iniDir;
                 }
 
                 System.Windows.Forms.DialogResult o = ofd.ShowDialog();
 
-                if (o != System.Windows.Forms.DialogResult.OK || !File.Exists(ofd.FileName)) {
+                if (o != System.Windows.Forms.DialogResult.OK || !File.Exists(ofd.FileName))
+                {
                     return;
                 }
 
                 OpenProject(ofd.FileName);
 
                 //Save last folder path
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 MessageBox.Show("Loading File Error, file no more supported", "Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.None);
             }
         }
@@ -205,8 +216,10 @@
         /// <param name="filepath">The filepath.</param>
         public void OpenProject(string filepath)
         {
-            try {
-                if (string.IsNullOrEmpty(filepath) || !File.Exists(filepath)) {
+            try
+            {
+                if (string.IsNullOrEmpty(filepath) || !File.Exists(filepath))
+                {
                     MessageBox.Show("This file doesn't exist : " + filepath, "Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.None);
                     return;
                 }
@@ -215,7 +228,8 @@
 
                 AutoSquirrelModel m = FileUtility.Deserialize<AutoSquirrelModel>(filepath);
 
-                if (m == null) {
+                if (m == null)
+                {
                     return;
                 }
 
@@ -224,7 +238,9 @@
                 this.Model.RefreshPackageVersion();
                 AddLastProject(filepath);
                 NotifyOfPropertyChange(() => this.WindowTitle);
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 MessageBox.Show("Loading File Error, file no more supported", "Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.None);
             }
         }
@@ -237,8 +253,10 @@
         /// </exception>
         public void PublishPackage()
         {
-            try {
-                if (this.ActiveBackgroungWorker?.IsBusy == true) {
+            try
+            {
+                if (this.ActiveBackgroungWorker?.IsBusy == true)
+                {
                     Trace.TraceError("You shouldn't be here !");
                     return;
                 }
@@ -249,11 +267,13 @@
                 Trace.WriteLine("START PUBLISHING ! : " + this.Model.Title);
 
                 // 1) Check validity
-                if (!this.Model.IsValid) {
+                if (!this.Model.IsValid)
+                {
                     throw new Exception("Package Details are invalid or incomplete !");
                 }
 
-                if (this.Model.SelectedConnection == null || !this.Model.SelectedConnection.IsValid) {
+                if (this.Model.SelectedConnection == null || !this.Model.SelectedConnection.IsValid)
+                {
                     throw new Exception("Selected connection details are not valid !");
                 }
 
@@ -264,7 +284,8 @@
                 // I proceed only if i created the project .asproj file and directory I need existing
                 // directory to create the packages.
 
-                if (!this._isSaved) {
+                if (!this._isSaved)
+                {
                     return;
                 }
 
@@ -277,7 +298,9 @@
                 this.ActiveBackgroungWorker.ProgressChanged += this.ActiveBackgroungWorker_ProgressChanged;
 
                 this.ActiveBackgroungWorker.RunWorkerAsync(this);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 MessageBox.Show(ex.ToString(), "Error on publishing", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -311,10 +334,12 @@
         /// </summary>
         public void Save()
         {
-            if (this.FilePath.Contains(".asproj")) {
+            if (this.FilePath.Contains(".asproj"))
                 this.FilePath = Path.GetDirectoryName(this.FilePath);
-            }
-            if (string.IsNullOrWhiteSpace(this.FilePath)) {
+
+
+            if (string.IsNullOrWhiteSpace(this.FilePath))
+            {
                 SaveAs();
                 return;
             }
@@ -322,11 +347,13 @@
             this.Model.NupkgOutputPath = this.FilePath + Path.DirectorySeparatorChar + this.Model.AppId + "_files" + PathFolderHelper.PackageDirectory;
             this.Model.SquirrelOutputPath = this.FilePath + Path.DirectorySeparatorChar + this.Model.AppId + "_files" + PathFolderHelper.ReleasesDirectory;
 
-            if (!Directory.Exists(this.Model.NupkgOutputPath)) {
+            if (!Directory.Exists(this.Model.NupkgOutputPath))
+            {
                 Directory.CreateDirectory(this.Model.NupkgOutputPath);
             }
 
-            if (!Directory.Exists(this.Model.SquirrelOutputPath)) {
+            if (!Directory.Exists(this.Model.SquirrelOutputPath))
+            {
                 Directory.CreateDirectory(this.Model.SquirrelOutputPath);
             }
 
@@ -349,21 +376,25 @@
         {
             var previousFilePath = this.FilePath;
 
-            try {
+            try
+            {
                 var saveFileDialog = new System.Windows.Forms.FolderBrowserDialog
                 {
                     SelectedPath = PathFolderHelper.GetMyDirectory(MyDirectory.Project),
                     ShowNewFolderButton = true
                 };
 
-                if (saveFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) {
+                if (saveFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                {
                     return;
                 }
 
                 this.FilePath = saveFileDialog.SelectedPath;
 
                 Save();
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 MessageBox.Show("Error on saving");
 
                 this.FilePath = previousFilePath;
@@ -386,11 +417,13 @@
 
             //As Squirrel convention i put everything in lib/net45 folder
 
-            const string directoryBase = "/lib/net45";
+            //const string directoryBase = "/lib/net45";
+            const string directoryBase = "/lib/netcoreapp3.0";
 
             var files = new List<ManifestFile>();
 
-            foreach (ItemLink node in model.PackageFiles) {
+            foreach (ItemLink node in model.PackageFiles)
+            {
                 AddFileToPackage(directoryBase, node, files);
             }
 
@@ -398,7 +431,8 @@
 
             var nugetPath = model.NupkgOutputPath + model.AppId + "." + model.Version + ".nupkg";
 
-            using (FileStream stream = File.Open(nugetPath, FileMode.OpenOrCreate)) {
+            using (FileStream stream = File.Open(nugetPath, FileMode.OpenOrCreate))
+            {
                 builder.Save(stream);
             }
 
@@ -409,13 +443,17 @@
         {
             // Don't add manifest if is directory
 
-            if (node.IsDirectory) {
+            if (node.IsDirectory)
+            {
                 directoryBase += "/" + node.Filename;
 
-                foreach (ItemLink subNode in node.Children) {
+                foreach (ItemLink subNode in node.Children)
+                {
                     AddFileToPackage(directoryBase, subNode, files);
                 }
-            } else {
+            }
+            else
+            {
                 var manifest = new ManifestFile()
                 {
                     Source = node.SourceFilepath
@@ -429,14 +467,16 @@
 
         private void ActiveBackgroungWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            try {
+            try
+            {
                 this.ActiveBackgroungWorker.ReportProgress(20, "NUGET PACKAGE CREATING");
 
                 // Create Nuget Package from package treeview.
                 var nugetPackagePath = CreateNugetPackage(this.Model);
                 Trace.WriteLine("CREATED NUGET PACKAGE to : " + this.Model.NupkgOutputPath);
 
-                if (this.ActiveBackgroungWorker.CancellationPending) {
+                if (this.ActiveBackgroungWorker.CancellationPending)
+                {
                     return;
                 }
 
@@ -445,7 +485,9 @@
                 // Releasify
                 SquirrelReleasify(nugetPackagePath, this.Model.SquirrelOutputPath);
                 Trace.WriteLine("CREATED SQUIRREL PACKAGE to : " + this.Model.SquirrelOutputPath);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 e.Result = ex;
             }
         }
@@ -454,7 +496,8 @@
         {
             //todo : Update busy indicator information.
             var message = e.UserState as string;
-            if (message == null) {
+            if (message == null)
+            {
                 return;
             }
 
@@ -463,7 +506,8 @@
 
         private void AddLastProject(string filePath)
         {
-            foreach (var fp in this.UserPreference.LastOpenedProject.Where(p => string.Equals(p, filePath, StringComparison.CurrentCultureIgnoreCase)).ToList()) {
+            foreach (var fp in this.UserPreference.LastOpenedProject.Where(p => string.Equals(p, filePath, StringComparison.CurrentCultureIgnoreCase)).ToList())
+            {
                 this.UserPreference.LastOpenedProject.Remove(fp);
             }
 
@@ -487,8 +531,10 @@
 
             this.ActiveBackgroungWorker = null;
 
-            if (this._abortPackageFlag) {
-                if (this.Model.UploadQueue != null) {
+            if (this._abortPackageFlag)
+            {
+                if (this.Model.UploadQueue != null)
+                {
                     this.Model.UploadQueue.Clear();
                 }
 
@@ -497,14 +543,16 @@
                 return;
             }
 
-            if (e.Result is Exception ex) {
+            if (e.Result is Exception ex)
+            {
                 MessageBox.Show(ex.Message, "Package creation error", MessageBoxButton.OK, MessageBoxImage.Error);
 
                 //todo : Manage generated error
                 return;
             }
 
-            if (e.Cancelled) {
+            if (e.Cancelled)
+            {
                 return;
             }
 
@@ -533,12 +581,14 @@
             */
             var cmd = $@" -releasify {nugetPackagePath} -releaseDir {squirrelOutputPath} -l 'Desktop'";
 
-            if (File.Exists(this.Model.IconFilepath)) {
+            if (File.Exists(this.Model.IconFilepath))
+            {
                 cmd += @" -i " + this.Model.IconFilepath;
                 cmd += @" -setupIcon " + this.Model.IconFilepath;
             }
 
-            if (File.Exists(this.Model.SplashFilepath)) {
+            if (File.Exists(this.Model.SplashFilepath))
+            {
                 cmd += @" -g " + Path.GetFullPath(this.Model.SplashFilepath);
             }
 
@@ -549,7 +599,8 @@
                 Arguments = cmd
             };
 
-            using (this.exeProcess = Process.Start(startInfo)) {
+            using (this.exeProcess = Process.Start(startInfo))
+            {
                 this.exeProcess.WaitForExit();
             }
         }
